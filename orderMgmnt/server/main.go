@@ -13,25 +13,27 @@ import (
 
 type server struct {
 	pb.UnimplementedOrderManagementServer
+	orderMap map[string]*pb.Order
 }
 
 const (
 	port = ":25000"
 )
 
-var orderMap = make(map[string]*pb.Order)
-
 func (s *server) GetOrder(ctx context.Context, in *pb.OrderID) (*pb.Order, error) {
-	_, exists := orderMap[in.Value]
+	_, exists := s.orderMap[in.Value]
 	if exists {
-		return orderMap[in.Value], nil
+		return s.orderMap[in.Value], nil
 	}
 	return nil, errors.New("order does not exist")
 }
 
 func (s *server) AddOrder(ctx context.Context, in *pb.Order) (*pb.OrderID, error) {
 	in.Id = uuid.New().String()
-	orderMap[in.Id] = in
+	if s.orderMap == nil {
+		s.orderMap = make(map[string]*pb.Order)
+	}
+	s.orderMap[in.Id] = in
 	log.Printf("Order Added: %v", in.Id)
 	return &pb.OrderID{Value: in.Id}, nil
 }
