@@ -5,6 +5,7 @@ option go_package = "github.com/chkda/go-grpc-course/orderMgmnt/orderMgmnt";
 package orderMgmnt;
 
 service OrderManagement {
+    rpc addOrder(Order) returns (OrderID);
     rpc getOrder(OrderID) returns (Order);
 }
 
